@@ -1,0 +1,68 @@
+# Bytecode de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+env.bak/
+venv.bak/
+
+# Archivos de configuración de VSCode
+.vscode/
+
+# Archivos de paquetes y dependencias
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Archivos de logs y bases de datos temporales
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# Archivos de Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de test/cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache/
+
+# Configs de herramientas de formato/estilo
+.mypy_cache/
+.pyre/
+.pytype/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Archivos de cobertura
+coverage.xml
+*.cover
+
+# Entornos y variables secretas
+.env
+.env.*
+
+# PyInstaller
+*.spec
+
+# Editor JetBrains (si algún colaborador usa PyCharm)
+.idea/
+
+#signals
+signals_*.json

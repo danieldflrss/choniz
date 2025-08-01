@@ -1,0 +1,6 @@
+numpy
+pandas
+iqoptionapi @ git+https://github.com/iqoptionapi/iqoptionapi.git
+websockets
+requests
+aiohttp
