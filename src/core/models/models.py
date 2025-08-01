@@ -57,6 +57,8 @@ class Candle:
 
 @dataclass
 class Signal:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
     """Modelo para señales de trading"""
     timestamp: datetime
     symbol: str

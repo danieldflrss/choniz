@@ -21,7 +21,7 @@ class TradingBot:
         self.market_system = RealTimeMarketSystem(data_source, **credentials)
         
         # Configurar callbacks
-        self.market_system.add_signal_callback(self.alert_system.send_alert)
+        self.market_system.add_signal_callback(self.alert_system.send_signal_alert)
         self.market_system.add_signal_callback(self.ws_server.broadcast_signal)
     
     async def start(self):

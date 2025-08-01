@@ -42,23 +42,34 @@ class IQOptionsDataProvider(DataProvider):
             raise
 
     async def subscribe_candles(self, symbol: str, timeframe: int, callback: Callable):
-        """Enhanced version with better new candle detection"""
+        """Enhanced version that returns only completed candles, excluding current incomplete candle"""
         if not self.is_connected:
             await self.connect()
         
-        self.api.start_candles_stream(symbol, timeframe, 1)
+        self.api.start_candles_stream(symbol, timeframe, 2)
         self.logger.info(f"Subscribed to {symbol} with timeframe {timeframe}s")
         
         candle_cache: Dict[int, Candle] = {}
+        last_completed_candle_timestamp = None
         
         try:
             while True:
                 candles_data = self.api.get_realtime_candles(symbol, timeframe)
                 
                 if candles_data:
-                    for timestamp, candle_data in candles_data.items():
-                        # Check if this is a new candle we haven't seen before
-                        if timestamp not in candle_cache:
+                    # Sort candles by timestamp to identify the most recent ones
+                    sorted_timestamps = sorted(candles_data.keys())
+                    
+                    # Process all candles except the most recent one (current incomplete candle)
+                    completed_candles = sorted_timestamps[:-1] if len(sorted_timestamps) > 1 else []
+                    
+                    for timestamp in completed_candles:
+                        candle_data = candles_data[timestamp]
+                        
+                        # Check if this is a new completed candle we haven't processed
+                        if (timestamp not in candle_cache and 
+                            (last_completed_candle_timestamp is None or timestamp > last_completed_candle_timestamp)):
+                            
                             # Create new Candle object
                             new_candle = Candle(
                                 timestamp=candle_data['from'],
@@ -66,17 +77,18 @@ class IQOptionsDataProvider(DataProvider):
                                 high=float(candle_data['max']),
                                 low=float(candle_data['min']),
                                 close=float(candle_data['close']),
-                                volume=int(candle_data.get('volume', 0))
+                                volume=int(candle_data.get('volume', 1000))
                             )
                             
                             # Add to cache
                             candle_cache[timestamp] = new_candle
+                            last_completed_candle_timestamp = timestamp
                             
-                            # Log new candle
+                            # Log new completed candle
                             candle_time = datetime.fromtimestamp(timestamp)
                             self.logger.info(f"New candle for {symbol} at {candle_time}")
                             
-                            # Execute callback
+                            # Execute callback only for completed candles
                             try:
                                 if asyncio.iscoroutinefunction(callback):
                                     await callback(new_candle)
@@ -85,7 +97,7 @@ class IQOptionsDataProvider(DataProvider):
                             except Exception as e:
                                 self.logger.error(f"Callback error: {e}")
                     
-                    # Clean old candles from cache (keep only last 10)
+                    # Clean old candles from cache (keep only last 10 completed candles)
                     if len(candle_cache) > 10:
                         oldest_timestamps = sorted(candle_cache.keys())[:-10]
                         for old_timestamp in oldest_timestamps:

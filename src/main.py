@@ -3,7 +3,7 @@ import logging
 from bot.trading_bot import TradingBot
 import asyncio
 
-from config.config import BINANCE_CONFIG, FOREX_CONFIG, IQ_OPTIONS_CONFIG
+from config.config import  DEFAULT_CONFIG
 
 # ================================
 # FUNCIÓN PRINCIPAL
@@ -19,7 +19,7 @@ async def main():
     )
     
     # Seleccionar configuración (cambiar según necesidad)
-    config = IQ_OPTIONS_CONFIG  # Usar Binance por defecto
+    config = DEFAULT_CONFIG  # Usar Binance por defecto
     
     # Crear y iniciar bot
     bot = TradingBot(config)
